@@ -1,0 +1,3 @@
+Server running on http://localhost:3000
+Visit http://localhost:3000 to see your feedback form.
+Visit http://localhost:3000/view-feedbacks to see submitted data.

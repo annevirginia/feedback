@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Hub | Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --bg: #0f172a;
+            --card: rgba(30, 41, 59, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 40px 0 10px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Header / Stats Section */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        /* Toolbar Section */
+        .toolbar {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            backdrop-filter: blur(16px);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-wrapper {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .selection-panel {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-left: 10px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Feedback Grid */
+        .feedback-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .feedback-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            gap: 20px;
+            animation: fadeIn 0.4s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-card:hover {
+            border-color: var(--primary);
+            background: rgba(30, 41, 59, 0.9);
+            transform: scale(1.01);
+        }
+
+        .feedback-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0;
+        }
+
+        .feedback-card:hover::before {
+            opacity: 1;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: flex-start;
+            padding-top: 5px;
+        }
+
+        .custom-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .feedback-checkbox:checked+.custom-checkbox {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .feedback-checkbox:checked+.custom-checkbox::after {
+            content: '✓';
+            color: white;
+            font-weight: 900;
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-id {
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+
+        .timestamp {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .message-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .badge {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .empty-state {
+            padding: 100px 20px;
+            text-align: center;
+            background: var(--card);
+            border-radius: 24px;
+            border: 2px dashed var(--border);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #sync-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 99px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Feedback Admin.</h1>
+    <p class="subtitle">Live insights and session management</p>
+
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">Total Received</div>
+                <div id="stat-total" class="stat-value">0</div>
+            </div>
+            <div id="selection-stats" class="stat-card hidden">
+                <div class="stat-label">Selected</div>
+                <div id="stat-selected" class="stat-value">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">System Mode</div>
+                <div id="stat-mode" class="stat-value" style="color: var(--success)">LIVE</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="selection-panel">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)">
+                    <div class="custom-checkbox"></div>
+                    <span>Select All</span>
+                </label>
+            </div>
+
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="search-input" placeholder="Filter by message, ID, or user..."
+                    oninput="handleSearch()">
+            </div>
+
+            <button id="btnDeleteSelected" class="btn btn-danger hidden" onclick="deleteSelected()">
+                Delete Selected
+            </button>
+
+            <button class="btn btn-secondary" onclick="forceSync()">
+                Sync Server
+            </button>
+        </div>
+
+        <div id="feedbackList" class="feedback-list">
+            <!-- Feedbacks will be injected here -->
+        </div>
+
+        <div id="emptyState" class="empty-state hidden">
+            <span class="empty-icon">📂</span>
+            <h3>No feedback found</h3>
+            <p id="emptyText">The feedback vault is currently empty.</p>
+        </div>
+    </div>
+
+    <div id="sync-status">
+        <div class="pulse"></div>
+        <span id="sync-text">Connected to Hub</span>
+    </div>
+
+    <script>
+        let feedbackList = JSON.parse(localStorage.getItem('receiver_feedbacks') || '[]');
+        let isConnected = false;
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = feedbackList.length;
+            const selectedCount = document.querySelectorAll('.feedback-checkbox:checked').length;
+            const selectionCard = document.getElementById('selection-stats');
+            const deleteBtn = document.getElementById('btnDeleteSelected');
+
+            if (selectedCount > 0) {
+                selectionCard.classList.remove('hidden');
+                deleteBtn.classList.remove('hidden');
+                document.getElementById('stat-selected').innerText = selectedCount;
+            } else {
+                selectionCard.classList.add('hidden');
+                deleteBtn.classList.add('hidden');
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('receiver_feedbacks', JSON.stringify(feedbackList));
+            updateStats();
+        }
+
+        function renderFeedbacks() {
+            const container = document.getElementById('feedbackList');
+            const emptyState = document.getElementById('emptyState');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            // Sort by latest
+            feedbackList.sort((a, b) => b.id - a.id);
+
+            const filtered = feedbackList.filter(f =>
+                (f.message || '').toLowerCase().includes(searchTerm) ||
+                (f.id || '').toString().includes(searchTerm) ||
+                (f.name || '').toLowerCase().includes(searchTerm)
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                document.getElementById('emptyText').innerText = feedbackList.length === 0
+                    ? "The feedback vault is currently empty."
+                    : "No filters matched your search.";
+                updateStats();
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = filtered.map(f => `
+                <div class="feedback-card" data-id="${f.id}">
+                    <div class="checkbox-wrapper">
+                        <label>
+                            <input type="checkbox" class="feedback-checkbox" data-id="${f.id}" onchange="updateStats()">
+                            <div class="custom-checkbox"></div>
+                        </label>
+                    </div>
+                    <div class="content-area">
+                        <div class="header-info">
+                            <span class="user-id">#${f.id}</span>
+                            <div style="display: flex; align-items:center; gap: 15px">
+                                <span class="badge">Live Arrival</span>
+                                <span class="timestamp">${new Date(f.timestamp).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="message-text">${f.message}</div>
+                        ${f.name ? `<div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted)">— ${f.name} (${f.email || 'No email'})</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            updateStats();
+        }
+
+        function handleSearch() {
+            renderFeedbacks();
+        }
+
+        function toggleSelectAll(checkbox) {
+            const boxes = document.querySelectorAll('.feedback-checkbox');
+            boxes.forEach(b => b.checked = checkbox.checked);
+            updateStats();
+        }
+
+        function getApiUrl(path) {
+            const origin = window.location.origin.includes('http') ? '' : 'http://localhost:3000';
+            return origin + path;
+        }
+
+        async function deleteSelected() {
+            const selectedChecks = Array.from(document.querySelectorAll('.feedback-checkbox:checked'));
+            const ids = selectedChecks.map(c => Number(c.getAttribute('data-id')));
+
+            if (ids.length === 0) return;
+
+            if (!confirm(`Permanently delete ${ids.length} entries?`)) return;
+
+            try {
+                const response = await fetch(getApiUrl('/feedback'), {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: ids })
+                });
+
+                if (response.ok) {
+                    console.log("Delete successful for:", ids);
+                    // Local fallback sync
+                    feedbackList = feedbackList.filter(f => !ids.includes(Number(f.id)));
+                    saveState();
+                    renderFeedbacks();
+                } else {
+                    const err = await response.json();
+                    alert("Delete failed: " + (err.message || "Server Error"));
+                }
+            } catch (error) {
+                console.error("Delete transmission failed:", error);
+                alert("Connection failed. Check if server is running at http://localhost:3000");
+            }
+        }
+
+        async function forceSync() {
+            try {
+                const res = await fetch(getApiUrl('/view-feedbacks'));
+                if (res.ok) {
+                    const data = await res.json();
+                    feedbackList = data;
+                    saveState();
+                    renderFeedbacks();
+                    console.log("Forced sync complete");
+                }
+            } catch (err) {
+                console.error("Sync failed:", err);
+            }
+        }
+
+        function connectSSE() {
+            const sseUrl = window.location.origin.includes('http') ? '/events' : 'http://localhost:3000/events';
+            const evtSource = new EventSource(sseUrl);
+
+            evtSource.onopen = () => {
+                isConnected = true;
+                document.getElementById('sync-text').innerText = "Connected to Hub";
+                document.querySelector('.pulse').style.background = "var(--success)";
+                document.querySelector('.pulse').style.boxShadow = "0 0 10px var(--success)";
+            };
+
+            evtSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log("Broadcasting Event:", data);
+
+                if (data.type === 'init') {
+                    feedbackList = data.data;
+                } else if (data.type === 'delete') {
+                    feedbackList = feedbackList.filter(f => Number(f.id) !== Number(data.id));
+                } else if (data.type === 'delete_multiple') {
+                    const idsToRemove = data.ids.map(Number);
+                    feedbackList = feedbackList.filter(f => !idsToRemove.includes(Number(f.id)));
+                } else if (data.type === 'clear_all') {
+                    feedbackList = [];
+                } else {
+                    // New arrival
+                    const exists = feedbackList.some(f => Number(f.id) === Number(data.id));
+                    if (!exists) {
+                        feedbackList.push(data);
+                        showVisualAlert();
+                    }
+                }
+                saveState();
+                renderFeedbacks();
+            };
+
+            evtSource.onerror = () => {
+                isConnected = false;
+                document.getElementById('sync-text').innerText = "Reconnecting...";
+                document.querySelector('.pulse').style.background = "var(--danger)";
+                document.querySelector('.pulse').style.boxShadow = "0 0 10px var(--danger)";
+                evtSource.close();
+                setTimeout(connectSSE, 3000);
+            };
+        }
+
+        function showVisualAlert() {
+            // Sound effect
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.play().catch(() => { });
+
+            // Notification if allowed
+            if (Notification.permission === "granted") {
+                new Notification("🚀 New Feedback!", { body: "A new insight has arrived." });
+            }
+        }
+
+        // Initial launch
+        Notification.requestPermission();
+        renderFeedbacks();
+        connectSSE();
+    </script>
+</body>
+
+</html>

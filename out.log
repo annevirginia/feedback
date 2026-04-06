@@ -1,0 +1,4 @@
+Server running on http://localhost:3000
+Visit http://localhost:3000 to see your feedback form.
+Visit http://localhost:3000/receiver.html to see the Receiver Dashboard (Notified Side).
+Visit http://localhost:3000/view-feedbacks to see raw filtered data.
